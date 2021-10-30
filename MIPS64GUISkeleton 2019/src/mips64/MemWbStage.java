@@ -19,5 +19,12 @@ public class MemWbStage {
     }
 
     public void update() {
+        
+
+        ExMemStage prevStage = simulator.getExMemStage();
+        this.opcode = prevStage.opcode;
+        this.aluIntData = prevStage.aluIntData;
+        //this.loadIntData =
+
     }
 }

@@ -9,6 +9,8 @@ public class IdExStage {
     int regAData;
     int regBData;
     int immediate;
+    int aluResult;
+    boolean isZero = false;
 
     public IdExStage(PipelineSimulator sim) {
         simulator = sim;
@@ -20,5 +22,6 @@ public class IdExStage {
     }
 
     public void update() {
+        
     }
 }

@@ -12,6 +12,7 @@ public class IfIdStage {
   }
 
   public void update() {
-
+    ProgramCounter prevStage = simulator.getPCStage();
+    //this.instPC = prevStage.
   }
 }
