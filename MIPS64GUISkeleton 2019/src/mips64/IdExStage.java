@@ -10,7 +10,7 @@ public class IdExStage {
     int regBData;
     int immediate;
     int aluResult;
-    boolean isZero = false;
+    Instruction inst;
 
     public IdExStage(PipelineSimulator sim) {
         simulator = sim;
@@ -22,6 +22,7 @@ public class IdExStage {
     }
 
     public void update() {
-        
+        //move instrcution down pipeline
+        inst = simulator.ifId.inst;
     }
 }
