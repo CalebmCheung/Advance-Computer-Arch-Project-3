@@ -2,7 +2,6 @@ package mips64;
 public class ExMemStage {
 
     PipelineSimulator simulator;
-    boolean shouldWriteback = false;
     boolean branchTaken = false;
     boolean jump = false;
     boolean isSquashed;

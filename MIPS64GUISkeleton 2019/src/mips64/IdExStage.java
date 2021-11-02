@@ -3,7 +3,6 @@ package mips64;
 public class IdExStage {
 
     PipelineSimulator simulator;
-    boolean shouldWriteback = false;
     boolean isSquashed;
 
     int instPC;
