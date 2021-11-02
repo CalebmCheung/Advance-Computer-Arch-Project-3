@@ -7,6 +7,7 @@ public class MemWbStage {
     boolean isSquashed;
     boolean branchTaken;
     boolean jump;
+    boolean shouldWriteback = false;
 
     int instPC;
     int opcode;
@@ -39,6 +40,7 @@ public class MemWbStage {
         branchTaken = prevStage.isZero();
         instPC = prevStage.instPC;
         jump = prevStage.jump;
+        shouldWriteback = prevStage.shouldWriteback;
 
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
@@ -63,7 +65,7 @@ public class MemWbStage {
             //simulator.ifId.updateReg(((ITypeInst)inst).getRT(), loadIntData);
             WBaddr = ((ITypeInst)inst).getRT();
             WBdata = loadIntData;
-        }else if(inst instanceof RTypeInst) {
+        }else if(shouldWriteback == true) {
             //simulator.ifId.updateReg(((RTypeInst)inst).getRD(), aluIntData);
             WBaddr = ((RTypeInst)inst).getRT();
             WBdata = loadIntData;

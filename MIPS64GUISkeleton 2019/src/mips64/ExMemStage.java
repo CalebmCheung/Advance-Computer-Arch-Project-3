@@ -5,6 +5,7 @@ public class ExMemStage {
     boolean branchTaken = false;
     boolean jump = false;
     boolean isSquashed;
+    boolean shouldWriteback = false;
 
     int instPC;
     int opcode;
@@ -44,6 +45,7 @@ public class ExMemStage {
         //reset flags for next instruction
         jump = false;
         branchTaken = false;
+        shouldWriteback = prevStage.shouldWriteback;
         
         operand1 = prevStage.regAData;
         operand2 = prevStage.regBData;

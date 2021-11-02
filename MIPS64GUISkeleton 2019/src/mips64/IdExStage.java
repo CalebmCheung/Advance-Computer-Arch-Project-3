@@ -4,6 +4,7 @@ public class IdExStage {
 
     PipelineSimulator simulator;
     boolean isSquashed;
+    boolean shouldWriteback = false;
 
     int instPC;
     int opcode;
@@ -39,7 +40,11 @@ public class IdExStage {
         instPC = prevStage.instPC;
         opcode = prevStage.opcode;
         inst = prevStage.inst;
+        shouldWriteback = false;
 
+        if (inst instanceof RTypeInst){
+            shouldWriteback = true;
+        }
         //get fowarded data
         MemWbStage memStage = simulator.getMemWbStage();
         WBaddr = memStage.WBaddr;
