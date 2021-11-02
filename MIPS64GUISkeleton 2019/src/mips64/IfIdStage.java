@@ -26,6 +26,7 @@ public class IfIdStage {
 
     MemoryModel mem = simulator.getMemory();
     inst = mem.getInstAtAddr(instPC);
+    opcode = inst.getOpcode();
 
     //PC logic
     if(branchTaken == true || jump == true ){
