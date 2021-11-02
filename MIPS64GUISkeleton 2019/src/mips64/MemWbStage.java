@@ -29,8 +29,6 @@ public class MemWbStage {
     }
 
     public void update() {
-
-        
         
         ExMemStage prevStage = simulator.getExMemStage();
         opcode = prevStage.opcode;
@@ -41,6 +39,10 @@ public class MemWbStage {
         instPC = prevStage.instPC;
         jump = prevStage.jump;
 
+        if(inst == null){
+            return;
+        }
+        
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
         if(name == "LW") {

@@ -40,6 +40,10 @@ public class ExMemStage {
         //reset flags for next instruction
         jump = false;
         branchTaken = false;
+
+        if(inst == null){
+            return;
+        }
         
         operand1 = prevStage.regAData;
         operand2 = prevStage.regBData;

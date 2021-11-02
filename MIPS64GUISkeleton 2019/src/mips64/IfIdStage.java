@@ -27,6 +27,10 @@ public class IfIdStage {
     MemoryModel mem = simulator.getMemory();
     inst = mem.getInstAtAddr(instPC);
 
+    if(inst == null){
+      return;
+    }
+
     //PC logic
     if(branchTaken == true || jump == true ){
         prevStage.setPC(branchStage.aluIntData);

@@ -36,7 +36,10 @@ public class IdExStage {
         opcode = prevStage.opcode;
         inst = prevStage.inst;
 
-
+        if(inst == null){
+            return;
+        }
+        
         //get fowarded data
         MemWbStage memStage = simulator.getMemWbStage();
         WBaddr = memStage.WBaddr;
