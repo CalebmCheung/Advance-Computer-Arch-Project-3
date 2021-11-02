@@ -1,176 +1,156 @@
 package mips64;
-
 public class ExMemStage {
 
     PipelineSimulator simulator;
     boolean shouldWriteback = false;
+    boolean branchTaken = false;
+    boolean jump = false;
+    boolean isSquashed;
+
     int instPC;
     int opcode;
     int aluIntData;
-    int regA;
-    int regB;
+    int operand1;
+    int operand2;
     int immediate;
     int storeIntData;
-    boolean branchTaken = false;
-    Instruction inst;
     int aluResult;
+
+    Instruction inst;
 
     public ExMemStage(PipelineSimulator sim) {
         simulator = sim;
     }
     
     public boolean isZero(){
-
+        operand1 = simulator.getIdExStage().regAData;
+        if(operand1 == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public void update() {
         IdExStage prevStage = simulator.getIdExStage();
+        instPC = prevStage.instPC;
+        opcode = prevStage.opcode;
+        inst = prevStage.inst;
+        //reset flags for next instruction
+        jump = false;
+        branchTaken = false;
         
+        operand1 = prevStage.regAData;
+        operand2 = prevStage.regBData;
         String name = Instruction.getNameFromOpcode(opcode);
         //ALU Operations
-        if (name == "LW") {
-            return INST_LW;
-          }
-          else if (name == "SW") {
-            return INST_SW;
-          }
-          else if (name == "LWC1") {
-            return INST_LWC1;
-          }
-          else if (name == "SWC1") {
-            return INST_SWC1;
-          }
-          else if (name == "ADD") {
-            return INST_ADD;
-          }
-          else if (name == "ADDI") {
-            return INST_ADDI;
-          }
-          else if (name == "SUB") {
-            return INST_SUB;
-          }
-          else if (name == "MUL") {
-            return INST_MUL;
-          }
-          else if (name == "DIV") {
-            return INST_DIV;
-          }
-          else if (name == "AND") {
-            return INST_AND;
-          }
-          else if (name == "ANDI") {
-            return INST_ANDI;
-          }
-          else if (name == "OR") {
-            return INST_OR;
-          }
-          else if (name == "ORI") {
-            return INST_ORI;
-          }
-          else if (name == "XOR") {
-            return INST_XOR;
-          }
-          else if (name == "XORI") {
-            return INST_XORI;
-          }
-          else if (name == "SLL") {
-            return INST_SLL;
-          }
-          else if (name == "SRL") {
-            return INST_SRL;
-          }
-          else if (name == "SRA") {
-            return INST_SRA;
-          }
-          else if (name == "ADD.S") {
-            return INST_ADD_S;
-          }
-          else if (name == "SUB.S") {
-            return INST_SUB_S;
-          }
-          else if (name == "MUL.S") {
-            return INST_MUL_S;
-          }
-          else if (name == "DIV.S") {
-            return INST_DIV_S;
-          }
-          else if (name == "CTV.W.S") {
-            return INST_CVT_W_S;
-          }
-          else if (name == "CTV.S.W") {
-            return INST_CVT_S_W;
-          }
-          else if (name == "LT.S") {
-            return INST_C_LT_S;
-          }
-          else if (name == "LE.S") {
-            return INST_C_LE_S;
-          }
-          else if (name == "GT.S") {
-            return INST_C_GT_S;
-          }
-          else if (name == "GE.S") {
-            return INST_C_GE_S;
-          }
-          else if (name == "EQ.S") {
-            return INST_C_EQ_S;
-          }
-          else if (name == "NE.S") {
-            return INST_C_NE_S;
-          }
-          else if (name == "BEQ") {
-            return INST_BEQ;
-          }
-          else if (name == "BNE") {
-            return INST_BNE;
-          }
-          else if (name == "BLTZ") {
-            return INST_BLTZ;
-          }
-          else if (name == "BLEZ") {
-            return INST_BLEZ;
-          }
-          else if (name == "BGTZ") {
-            return INST_BGTZ;
-          }
-          else if (name == "BGEZ") {
-            return INST_BGEZ;
-          }
-          else if (name == "BC1T") {
-            return INST_BC1T;
-          }
-          else if (name == "BC1F") {
-            return INST_BC1F;
-          }
-          else if (name == "J") {
-            return INST_J;
-          }
-          else if (name == "JR") {
-            return INST_JR;
-          }
-          else if (name == "JAL") {
-            return INST_JAL;
-          }
-          else if (name == "JALR") {
-            return INST_JALR;
-          }
-          else if (name == "MTC1") {
-            return INST_MTC1;
-          }
-          else if (name == "MFC1") {
-            return INST_MFC1;
-          }
-      
-          else if (name == "NOP") {
-            return INST_NOP;
-          }
-          else if (name == "HALT") {
-            return INST_HALT;
-          }
-          else {
-            throw new MIPSException("unexpected operation name: "+name);
-          }
+        if (name == "LW" || name == "SW") {
+            aluResult = instPC + ((ITypeInst)inst).getImmed();
         }
-            
+        else if (name == "ADD") {
+            aluResult = operand1 + operand2;
+        }
+        else if (name == "ADDI") {
+            operand2 = ((ITypeInst)inst).getImmed();
+            aluResult = operand1 + operand2;
+        }
+        else if (name == "SUB") {
+            aluResult = operand1 - operand2;
+        }
+        else if (name == "MUL") {
+            aluResult = operand1 * operand2;
+        }
+        else if (name == "DIV") {
+            aluResult = operand1 / operand2;
+        }
+        else if (name == "AND") {
+            aluResult = operand1 & operand2;
+        }
+        else if (name == "ANDI") {
+            operand2 = ((ITypeInst)inst).getImmed();
+            aluResult = operand1 & operand2;
+        }
+        else if (name == "OR") {
+            aluResult = operand1 | operand2;
+        }
+        else if (name == "ORI") {
+            operand2 = ((ITypeInst)inst).getImmed();
+            aluResult = operand1 | operand2;
+        }
+        else if (name == "XOR") {
+            aluResult = operand1 ^ operand2;
+        }
+        else if (name == "XORI") {
+            operand2 = ((ITypeInst)inst).getImmed();
+            aluResult = operand1 ^ operand2;
+        }
+        else if (name == "SLL") {
+            operand2 = ((RTypeInst)inst).getShamt();
+            aluResult = operand1 << operand2;
+        }
+        else if (name == "SRL") {
+            operand2 = ((RTypeInst)inst).getShamt();
+            aluResult = operand1 >>> operand2;
+        }
+        else if (name == "SRA") {
+            operand2 = ((RTypeInst)inst).getShamt();
+            aluResult = operand1 >> operand2;
+        }
+        else if (name == "BEQ") {
+            if (operand1 == operand2){
+                branchTaken = true;
+            }
+        }
+        else if (name == "BNE") {
+            if (operand1 != operand2){
+                branchTaken = true;
+            }
+        }
+        else if (name == "BLTZ") {
+            if (operand1 < 0){
+                branchTaken = true;
+            }
+        }
+        else if (name == "BLEZ") {
+            if (operand1 <= 0){
+                branchTaken = true;
+            }
+        }
+        else if (name == "BGTZ") {
+            if (operand1 > 0){
+                branchTaken = true;
+            }
+        }
+        else if (name == "BGEZ") {
+            if (operand1 >= 0){
+                branchTaken = true;
+            }
+        }
+        else if (name == "J") {
+            aluResult = ((JTypeInst)inst).getOffset();
+            jump = true;
+        }
+        else if (name == "JR") {
+            aluResult = operand1;
+            jump = true;
+        }
+        else if (name == "JAL") {
+          aluResult = ((JTypeInst)inst).getOffset();
+          jump = true;
+        }
+        else if (name == "JALR") {
+            aluResult = operand1;
+            jump = true;
+        }
+        else if (name == "NOP") {
+            return;
+        }
+        else if (name == "HALT") {
+            return;
+        }
+        else {
+          throw new MIPSException("unexpected operation name: "+name);
+        }    
     }
 }

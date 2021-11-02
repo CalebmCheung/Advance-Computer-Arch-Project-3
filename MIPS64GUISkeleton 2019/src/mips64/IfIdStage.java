@@ -2,30 +2,36 @@ package mips64;
 
 public class IfIdStage {
   PipelineSimulator simulator;
+  boolean branchTaken;
+  boolean isSquashed;
+  boolean jump;
+
   int instPC;
   int opcode;
+
   Instruction inst;
-  
-  private int[] registers = new int[32];
 
   public IfIdStage(PipelineSimulator sim) {
     simulator = sim;
 
   }
-
-  public void updateReg(int addr, int data){
-    registers[addr] = data;
-  }
   
   public void update() {
+    MemWbStage branchStage = simulator.getMemWbStage();
+    branchTaken = branchStage.branchTaken;
+    jump = branchStage.jump;
+
     ProgramCounter prevStage = simulator.getPCStage();
-    opcode = prevStage.opcode;
+    instPC = prevStage.getPC();
 
-    //build instruction with opcode
-    String name = Instruction.getNameFromOpcode(opcode);
-    inst = Instruction.getInstructionFromName(name);
+    MemoryModel mem = simulator.getMemory();
+    inst = mem.getInstAtAddr(instPC);
 
-    
-    //this.instPC = prevStage.
+    //PC logic
+    if(branchTaken == true || jump == true ){
+        prevStage.setPC(branchStage.aluIntData);
+    }else{
+        prevStage.incrPC();
+    }
   }
 }
