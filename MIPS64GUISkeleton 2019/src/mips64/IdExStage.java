@@ -32,14 +32,15 @@ public class IdExStage {
 
     public void update() {
         IfIdStage prevStage = simulator.getIfIdStage();
+        inst = prevStage.inst;
+        if(inst == null){
+            return;
+        }
+
         instPC = prevStage.instPC;
         opcode = prevStage.opcode;
         inst = prevStage.inst;
 
-        if(inst == null){
-            return;
-        }
-        
         //get fowarded data
         MemWbStage memStage = simulator.getMemWbStage();
         WBaddr = memStage.WBaddr;

@@ -34,16 +34,17 @@ public class ExMemStage {
 
     public void update() {
         IdExStage prevStage = simulator.getIdExStage();
+        inst = prevStage.inst;
+        if(inst == null){
+            return;
+        }
+        
         instPC = prevStage.instPC;
         opcode = prevStage.opcode;
         inst = prevStage.inst;
         //reset flags for next instruction
         jump = false;
         branchTaken = false;
-
-        if(inst == null){
-            return;
-        }
         
         operand1 = prevStage.regAData;
         operand2 = prevStage.regBData;

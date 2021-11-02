@@ -29,20 +29,20 @@ public class MemWbStage {
     }
 
     public void update() {
-        
+
         ExMemStage prevStage = simulator.getExMemStage();
+        inst = prevStage.inst;
+        if(inst == null){
+            return;
+        }
+
         opcode = prevStage.opcode;
         aluIntData = prevStage.aluResult;
         branchTaken = prevStage.isZero();
         shouldWriteback = prevStage.shouldWriteback;
-        inst = prevStage.inst;
         instPC = prevStage.instPC;
         jump = prevStage.jump;
 
-        if(inst == null){
-            return;
-        }
-        
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
         if(name == "LW") {
