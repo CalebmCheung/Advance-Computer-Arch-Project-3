@@ -5,16 +5,15 @@ public class ExMemStage {
     boolean branchTaken = false;
     boolean jump = false;
     boolean isSquashed;
-    boolean shouldWriteback = false;
+    boolean shouldWriteback;
 
     int instPC;
     int opcode;
-    int aluIntData;
     int operand1;
     int operand2;
     int immediate;
     int storeIntData;
-    int aluResult;
+    int aluIntData;
 
     Instruction inst;
 
@@ -52,56 +51,56 @@ public class ExMemStage {
         String name = Instruction.getNameFromOpcode(opcode);
         //ALU Operations
         if (name == "LW" || name == "SW") {
-            aluResult = instPC + ((ITypeInst)inst).getImmed();
+            aluIntData = instPC + ((ITypeInst)inst).getImmed();
         }
         else if (name == "ADD") {
-            aluResult = operand1 + operand2;
+            aluIntData = operand1 + operand2;
         }
         else if (name == "ADDI") {
             operand2 = ((ITypeInst)inst).getImmed();
-            aluResult = operand1 + operand2;
+            aluIntData = operand1 + operand2;
         }
         else if (name == "SUB") {
-            aluResult = operand1 - operand2;
+            aluIntData = operand1 - operand2;
         }
         else if (name == "MUL") {
-            aluResult = operand1 * operand2;
+            aluIntData = operand1 * operand2;
         }
         else if (name == "DIV") {
-            aluResult = operand1 / operand2;
+            aluIntData = operand1 / operand2;
         }
         else if (name == "AND") {
-            aluResult = operand1 & operand2;
+            aluIntData = operand1 & operand2;
         }
         else if (name == "ANDI") {
             operand2 = ((ITypeInst)inst).getImmed();
-            aluResult = operand1 & operand2;
+            aluIntData = operand1 & operand2;
         }
         else if (name == "OR") {
-            aluResult = operand1 | operand2;
+            aluIntData = operand1 | operand2;
         }
         else if (name == "ORI") {
             operand2 = ((ITypeInst)inst).getImmed();
-            aluResult = operand1 | operand2;
+            aluIntData = operand1 | operand2;
         }
         else if (name == "XOR") {
-            aluResult = operand1 ^ operand2;
+            aluIntData = operand1 ^ operand2;
         }
         else if (name == "XORI") {
             operand2 = ((ITypeInst)inst).getImmed();
-            aluResult = operand1 ^ operand2;
+            aluIntData = operand1 ^ operand2;
         }
         else if (name == "SLL") {
             operand2 = ((RTypeInst)inst).getShamt();
-            aluResult = operand1 << operand2;
+            aluIntData = operand1 << operand2;
         }
         else if (name == "SRL") {
             operand2 = ((RTypeInst)inst).getShamt();
-            aluResult = operand1 >>> operand2;
+            aluIntData = operand1 >>> operand2;
         }
         else if (name == "SRA") {
             operand2 = ((RTypeInst)inst).getShamt();
-            aluResult = operand1 >> operand2;
+            aluIntData = operand1 >> operand2;
         }
         else if (name == "BEQ") {
             if (operand1 == operand2){
@@ -134,19 +133,19 @@ public class ExMemStage {
             }
         }
         else if (name == "J") {
-            aluResult = ((JTypeInst)inst).getOffset();
+            aluIntData = ((JTypeInst)inst).getOffset();
             jump = true;
         }
         else if (name == "JR") {
-            aluResult = operand1;
+            aluIntData = operand1;
             jump = true;
         }
         else if (name == "JAL") {
-          aluResult = ((JTypeInst)inst).getOffset();
+          aluIntData = ((JTypeInst)inst).getOffset();
           jump = true;
         }
         else if (name == "JALR") {
-            aluResult = operand1;
+            aluIntData = operand1;
             jump = true;
         }
         else if (name == "NOP") {

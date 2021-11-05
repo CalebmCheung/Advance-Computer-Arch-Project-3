@@ -42,7 +42,7 @@ public class IdExStage {
         inst = prevStage.inst;
         shouldWriteback = false;
 
-        if (inst instanceof RTypeInst){
+        if (inst instanceof RTypeInst || inst instanceof ITypeInst){
             shouldWriteback = true;
         }
         //get fowarded data
@@ -54,9 +54,10 @@ public class IdExStage {
         //parse instruction for registers
         if(inst instanceof ITypeInst) {
             int IR1 = ((ITypeInst)inst).getRS();
+            immediate = ((ITypeInst)inst).getImmed();
             regAData = getIntRegister(IR1);
         }
-        else if(inst instanceof JTypeInst){
+        else if(inst instanceof RTypeInst){
             int IR1 = ((RTypeInst)inst).getRS();
             int IR2 = ((RTypeInst)inst).getRT();
             regAData = getIntRegister(IR1);

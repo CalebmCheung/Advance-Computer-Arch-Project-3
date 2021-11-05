@@ -7,7 +7,7 @@ public class MemWbStage {
     boolean isSquashed;
     boolean branchTaken;
     boolean jump;
-    boolean shouldWriteback = false;
+    boolean shouldWriteback;
 
     int instPC;
     int opcode;
@@ -36,22 +36,22 @@ public class MemWbStage {
         }
 
         opcode = prevStage.opcode;
-        aluIntData = prevStage.aluResult;
-        branchTaken = prevStage.isZero();
+        aluIntData = prevStage.aluIntData;
+        branchTaken = prevStage.branchTaken;
         instPC = prevStage.instPC;
         jump = prevStage.jump;
         shouldWriteback = prevStage.shouldWriteback;
 
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
-    
+        MemoryModel mem = simulator.getMemory();
+        
         if(name == "SW") {
-            MemoryModel mem = simulator.getMemory();
             mem.setIntDataAtAddr(aluIntData,storeIntData);
+            return;
         }
 
         if(name == "JAL" || name == "JALR") {
-            MemoryModel mem = simulator.getMemory();
             mem.setIntDataAtAddr(aluIntData,storeIntData);
             jump = true;
         }
@@ -62,13 +62,19 @@ public class MemWbStage {
         
         // write back
         if(name == "LW"){
-            //simulator.ifId.updateReg(((ITypeInst)inst).getRT(), loadIntData);
+            //simulator.ifId.updateReg(((ITypeInst)inst).getRT(), loadIntData)
             WBaddr = ((ITypeInst)inst).getRT();
-            WBdata = loadIntData;
+            WBdata = mem.getIntDataAtAddr(aluIntData);
         }else if(shouldWriteback == true) {
             //simulator.ifId.updateReg(((RTypeInst)inst).getRD(), aluIntData);
-            WBaddr = ((RTypeInst)inst).getRT();
-            WBdata = loadIntData;
+            if (inst instanceof ITypeInst){
+                WBaddr = ((ITypeInst)inst).getRT();
+            }
+            else{
+                WBaddr = ((RTypeInst)inst).getRT();
+            }
+            
+            WBdata = aluIntData;
         }
         
     }

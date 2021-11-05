@@ -31,6 +31,8 @@ public class IfIdStage {
     //PC logic
     if(branchTaken == true || jump == true ){
         prevStage.setPC(branchStage.aluIntData);
+        branchTaken = false;
+        jump = false;
     }else{
         prevStage.incrPC();
     }
