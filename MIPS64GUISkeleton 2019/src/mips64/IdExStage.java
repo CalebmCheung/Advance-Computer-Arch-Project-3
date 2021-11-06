@@ -42,20 +42,33 @@ public class IdExStage {
         inst = prevStage.inst;
         shouldWriteback = false;
 
-        if (inst instanceof RTypeInst || inst instanceof ITypeInst){
+        String name = Instruction.getNameFromOpcode(opcode);
+
+        if (inst instanceof RTypeInst || name == "ADDI" || name == "ANDI" 
+                || name == "ORI" || name == "XORI") {
             shouldWriteback = true;
         }
+        
+        if(name == "JAL" || name == "JALR") {
+            updateReg(31,instPC+4);
+        }
+        
         //get fowarded data
-        MemWbStage memStage = simulator.getMemWbStage();
-        WBaddr = memStage.WBaddr;
-        WBdata = memStage.WBdata;
-        updateReg(WBaddr,WBdata);
+        //MemWbStage memStage = simulator.getMemWbStage();
+        //WBaddr = memStage.WBaddr;
+        //WBdata = memStage.WBdata;
+        //updateReg(WBaddr,WBdata);
 
         //parse instruction for registers
         if(inst instanceof ITypeInst) {
             int IR1 = ((ITypeInst)inst).getRS();
             immediate = ((ITypeInst)inst).getImmed();
             regAData = getIntRegister(IR1);
+
+            if (name == "SW") {
+                int IR2 = ((ITypeInst)inst).getRT();
+                regBData = getIntRegister(IR2);
+            }
         }
         else if(inst instanceof RTypeInst){
             int IR1 = ((RTypeInst)inst).getRS();

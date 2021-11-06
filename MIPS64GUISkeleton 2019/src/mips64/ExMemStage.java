@@ -50,8 +50,12 @@ public class ExMemStage {
         operand2 = prevStage.regBData;
         String name = Instruction.getNameFromOpcode(opcode);
         //ALU Operations
-        if (name == "LW" || name == "SW") {
-            aluIntData = instPC + ((ITypeInst)inst).getImmed();
+        if (name == "LW") {
+            aluIntData = operand1 + ((ITypeInst)inst).getImmed();
+        }
+        else if (name == "SW") {
+            aluIntData = operand1 + ((ITypeInst)inst).getImmed();
+            storeIntData = operand2;
         }
         else if (name == "ADD") {
             aluIntData = operand1 + operand2;
@@ -59,7 +63,7 @@ public class ExMemStage {
         else if (name == "ADDI") {
             operand2 = ((ITypeInst)inst).getImmed();
             aluIntData = operand1 + operand2;
-        }
+         }
         else if (name == "SUB") {
             aluIntData = operand1 - operand2;
         }
@@ -133,7 +137,7 @@ public class ExMemStage {
             }
         }
         else if (name == "J") {
-            aluIntData = ((JTypeInst)inst).getOffset();
+            aluIntData = instPC + ((JTypeInst)inst).getOffset();
             jump = true;
         }
         else if (name == "JR") {
@@ -141,8 +145,8 @@ public class ExMemStage {
             jump = true;
         }
         else if (name == "JAL") {
-          aluIntData = ((JTypeInst)inst).getOffset();
-          jump = true;
+            aluIntData = instPC + ((JTypeInst)inst).getOffset();
+            jump = true;
         }
         else if (name == "JALR") {
             aluIntData = operand1;

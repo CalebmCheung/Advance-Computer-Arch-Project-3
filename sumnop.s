@@ -16,10 +16,6 @@
 -- R8 = current array data value
 -- 
 Begin Assembly
-NOP
-NOP
-NOP
-NOP
 -- Stack will be at Org5000 - R30 is SP
 ADDI R30, R0, 5000
 NOP

@@ -33,8 +33,6 @@ public class IfIdStage {
         prevStage.setPC(branchStage.aluIntData);
         branchTaken = false;
         jump = false;
-    }else{
-        prevStage.incrPC();
     }
   }
 }

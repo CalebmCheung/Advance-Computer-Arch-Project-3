@@ -17,6 +17,10 @@ public class MemWbStage {
     int WBaddr;
     int WBdata;
 
+    int oldAluIntData;
+    Instruction oldInst;
+    String oldName;
+
     Instruction inst;
 
     public MemWbStage(PipelineSimulator sim) {
@@ -28,15 +32,45 @@ public class MemWbStage {
     }
 
     public void update() {
+        MemoryModel mem = simulator.getMemory();
+        IdExStage reg = simulator.getIdExStage();
 
+        // WB
+        if (inst != null) {
+            oldInst = inst;
+            oldAluIntData = aluIntData;
+            oldName = Instruction.getNameFromOpcode(oldInst.getOpcode());
+            //write back old variables
+            if(oldName == "LW"){
+                WBaddr = ((ITypeInst)oldInst).getRT();
+                WBdata = mem.getIntDataAtAddr(oldAluIntData);
+                reg.updateReg(WBaddr,WBdata);
+            }else if(shouldWriteback == true) {
+                if (inst instanceof ITypeInst){
+                    WBaddr = ((ITypeInst)oldInst).getRT();
+                }
+                else{
+                    WBaddr = ((RTypeInst)oldInst).getRD();
+                }
+                
+                WBdata = oldAluIntData;
+                reg.updateReg(WBaddr,WBdata);
+            }
+
+            if(oldName == "HALT") {
+                halted = true;
+            }
+        }
+
+        // Data memory
         ExMemStage prevStage = simulator.getExMemStage();
         inst = prevStage.inst;
         if(inst == null){
             return;
         }
-
         opcode = prevStage.opcode;
         aluIntData = prevStage.aluIntData;
+        storeIntData = prevStage.storeIntData;
         branchTaken = prevStage.branchTaken;
         instPC = prevStage.instPC;
         jump = prevStage.jump;
@@ -44,39 +78,17 @@ public class MemWbStage {
 
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
-        MemoryModel mem = simulator.getMemory();
+        
+        loadIntData = -1;
+        if (name == "LW"){
+            loadIntData = mem.getIntDataAtAddr(aluIntData);;
+        }
         
         if(name == "SW") {
             mem.setIntDataAtAddr(aluIntData,storeIntData);
             return;
         }
 
-        if(name == "JAL" || name == "JALR") {
-            mem.setIntDataAtAddr(aluIntData,storeIntData);
-            jump = true;
-        }
-
-        if(name == "HALT") {
-            halted = true;
-        }
-        
-        // write back
-        if(name == "LW"){
-            //simulator.ifId.updateReg(((ITypeInst)inst).getRT(), loadIntData)
-            WBaddr = ((ITypeInst)inst).getRT();
-            WBdata = mem.getIntDataAtAddr(aluIntData);
-        }else if(shouldWriteback == true) {
-            //simulator.ifId.updateReg(((RTypeInst)inst).getRD(), aluIntData);
-            if (inst instanceof ITypeInst){
-                WBaddr = ((ITypeInst)inst).getRT();
-            }
-            else{
-                WBaddr = ((RTypeInst)inst).getRT();
-            }
-            
-            WBdata = aluIntData;
-        }
-        
     }
 }
 
