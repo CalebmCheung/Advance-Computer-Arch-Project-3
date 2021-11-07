@@ -32,19 +32,32 @@ public class ExMemStage {
     }
 
     public void update() {
+        //reset flags for next instruction
+        jump = false;
+        branchTaken = false;
+        shouldWriteback = false;
+
         IdExStage prevStage = simulator.getIdExStage();
+
+        if (prevStage.isStalled == true) {
+            inst = Instruction.getInstructionFromName("NOP");
+            return;
+        }
+
         inst = prevStage.inst;
         if(inst == null){
             return;
         }
-
+        
         instPC = prevStage.instPC;
         opcode = prevStage.opcode;
         inst = prevStage.inst;
-        //reset flags for next instruction
-        jump = false;
-        branchTaken = false;
+        isSquashed = prevStage.isSquashed;
         shouldWriteback = prevStage.shouldWriteback;
+
+        if (isSquashed == true){
+            return;
+        }
         
         operand1 = prevStage.regAData;
         operand2 = prevStage.regBData;
@@ -109,31 +122,37 @@ public class ExMemStage {
         else if (name == "BEQ") {
             if (operand1 == operand2){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "BNE") {
             if (operand1 != operand2){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "BLTZ") {
             if (operand1 < 0){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "BLEZ") {
             if (operand1 <= 0){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "BGTZ") {
             if (operand1 > 0){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "BGEZ") {
             if (operand1 >= 0){
                 branchTaken = true;
+                aluIntData = instPC + ((ITypeInst)inst).getImmed();
             }
         }
         else if (name == "J") {

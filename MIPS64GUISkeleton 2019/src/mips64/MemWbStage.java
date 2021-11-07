@@ -5,7 +5,6 @@ public class MemWbStage {
     PipelineSimulator simulator;
     boolean halted;
     boolean isSquashed;
-    boolean branchTaken;
     boolean jump;
     boolean shouldWriteback;
 
@@ -17,9 +16,11 @@ public class MemWbStage {
     int WBaddr;
     int WBdata;
 
+    int oldLoadIntData;
     int oldAluIntData;
     Instruction oldInst;
     String oldName;
+    boolean oldShouldWriteBack;
 
     Instruction inst;
 
@@ -40,12 +41,14 @@ public class MemWbStage {
             oldInst = inst;
             oldAluIntData = aluIntData;
             oldName = Instruction.getNameFromOpcode(oldInst.getOpcode());
+            oldShouldWriteBack = shouldWriteback;
+            oldLoadIntData = loadIntData;
             //write back old variables
             if(oldName == "LW"){
                 WBaddr = ((ITypeInst)oldInst).getRT();
-                WBdata = mem.getIntDataAtAddr(oldAluIntData);
+                WBdata = oldLoadIntData;
                 reg.updateReg(WBaddr,WBdata);
-            }else if(shouldWriteback == true) {
+            }else if(oldShouldWriteBack == true) {
                 if (inst instanceof ITypeInst){
                     WBaddr = ((ITypeInst)oldInst).getRT();
                 }
@@ -71,10 +74,14 @@ public class MemWbStage {
         opcode = prevStage.opcode;
         aluIntData = prevStage.aluIntData;
         storeIntData = prevStage.storeIntData;
-        branchTaken = prevStage.branchTaken;
         instPC = prevStage.instPC;
         jump = prevStage.jump;
+        isSquashed = prevStage.isSquashed;
         shouldWriteback = prevStage.shouldWriteback;
+
+        if (isSquashed == true){
+            return;
+        }
 
         // load and store
         String name = Instruction.getNameFromOpcode(opcode);
@@ -88,7 +95,6 @@ public class MemWbStage {
             mem.setIntDataAtAddr(aluIntData,storeIntData);
             return;
         }
-
     }
 }
 

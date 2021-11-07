@@ -17,9 +17,18 @@ public class IfIdStage {
   }
   
   public void update() {
-    MemWbStage branchStage = simulator.getMemWbStage();
+    //check to see if the pipeline is stalled
+    IdExStage idExStage = simulator.getIdExStage();
+    if(idExStage.isStalled == true){
+      return;
+    }
+
+    //setup instruction data
+    isSquashed = false;
+    ExMemStage branchStage = simulator.getExMemStage();
     branchTaken = branchStage.branchTaken;
     jump = branchStage.jump;
+
 
     ProgramCounter prevStage = simulator.getPCStage();
     instPC = prevStage.getPC();
@@ -33,6 +42,7 @@ public class IfIdStage {
         prevStage.setPC(branchStage.aluIntData);
         branchTaken = false;
         jump = false;
+        isSquashed = true;
     }
   }
 }

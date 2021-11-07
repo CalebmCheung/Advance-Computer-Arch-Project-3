@@ -23,6 +23,11 @@ public class ProgramCounter {
   }
 
   public void update() {
+    //check to see if the pipeline is stalled
+    IdExStage idExStage = simulator.getIdExStage();
+    if(idExStage.isStalled == true){
+      return;
+    }
     incrPC();
   }
 }
