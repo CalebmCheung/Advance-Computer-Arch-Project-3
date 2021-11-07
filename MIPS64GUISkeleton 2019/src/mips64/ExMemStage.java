@@ -48,7 +48,7 @@ public class ExMemStage {
         if(inst == null){
             return;
         }
-        
+
         instPC = prevStage.instPC;
         opcode = prevStage.opcode;
         inst = prevStage.inst;

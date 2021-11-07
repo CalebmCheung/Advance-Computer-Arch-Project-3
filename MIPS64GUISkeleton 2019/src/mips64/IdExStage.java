@@ -79,6 +79,8 @@ public class IdExStage {
             IR2 = ((RTypeInst)inst).getRT();
         }
         
+        MemWbStage MemWB = simulator.getMemWbStage();
+
         // check to see if the instruction ahead writes back (for dependencies)
         if(exMem.shouldWriteback == true){
             int EXTargetreg;
@@ -90,6 +92,12 @@ public class IdExStage {
             }
 
             if(EXTargetreg == IR1 || EXTargetreg == IR2) {
+                isStalled = true;
+            }
+        }
+
+        if(MemWB.inst != null) {
+            if (Instruction.getNameFromOpcode(MemWB.inst.getOpcode()) == "LW"){
                 isStalled = true;
             }
         }
@@ -107,8 +115,6 @@ public class IdExStage {
             regAData = getIntRegister(IR1);
             regBData = getIntRegister(IR2);
         }
-
-        MemWbStage MemWB = simulator.getMemWbStage();
 
         // WB stage first in forwarding
         if(MemWB.oldShouldWriteBack == true){

@@ -21,6 +21,7 @@ public class MemWbStage {
     Instruction oldInst;
     String oldName;
     boolean oldShouldWriteBack;
+    boolean oldIsSquashed;
 
     Instruction inst;
 
@@ -38,30 +39,35 @@ public class MemWbStage {
 
         // WB
         if (inst != null) {
+
             oldInst = inst;
             oldAluIntData = aluIntData;
             oldName = Instruction.getNameFromOpcode(oldInst.getOpcode());
             oldShouldWriteBack = shouldWriteback;
             oldLoadIntData = loadIntData;
-            //write back old variables
-            if(oldName == "LW"){
-                WBaddr = ((ITypeInst)oldInst).getRT();
-                WBdata = oldLoadIntData;
-                reg.updateReg(WBaddr,WBdata);
-            }else if(oldShouldWriteBack == true) {
-                if (inst instanceof ITypeInst){
-                    WBaddr = ((ITypeInst)oldInst).getRT();
-                }
-                else{
-                    WBaddr = ((RTypeInst)oldInst).getRD();
-                }
-                
-                WBdata = oldAluIntData;
-                reg.updateReg(WBaddr,WBdata);
-            }
+            oldIsSquashed = isSquashed;
 
-            if(oldName == "HALT") {
-                halted = true;
+            if (oldIsSquashed == false){
+                //write back old variables
+                if(oldName == "LW"){
+                    WBaddr = ((ITypeInst)oldInst).getRT();
+                    WBdata = oldLoadIntData;
+                    reg.updateReg(WBaddr,WBdata);
+                }else if(oldShouldWriteBack == true) {
+                    if (inst instanceof ITypeInst){
+                        WBaddr = ((ITypeInst)oldInst).getRT();
+                    }
+                    else{
+                        WBaddr = ((RTypeInst)oldInst).getRD();
+                    }
+                    
+                    WBdata = oldAluIntData;
+                    reg.updateReg(WBaddr,WBdata);
+                }
+
+                if(oldName == "HALT") {
+                    halted = true;
+                }
             }
         }
 
@@ -71,6 +77,7 @@ public class MemWbStage {
         if(inst == null){
             return;
         }
+
         opcode = prevStage.opcode;
         aluIntData = prevStage.aluIntData;
         storeIntData = prevStage.storeIntData;
